@@ -1,0 +1,12 @@
+{
+    "name": "memricspotify",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+      "start": "node api/search.js"
+    },
+    "dependencies": {
+      "axios": "^1.6.0"
+    }
+  }
+  
