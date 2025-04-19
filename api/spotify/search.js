@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
 
     const token = tokenResponse.data.access_token;
 
-    const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`;
+    const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`;
     const searchResponse = await axios.get(searchUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
