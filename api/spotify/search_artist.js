@@ -11,6 +11,7 @@ module.exports = async (req, res) => {
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
   try {
+    // Access Token Al
     const tokenResponse = await axios.post(
       "https://accounts.spotify.com/api/token",
       new URLSearchParams({ grant_type: "client_credentials" }),
@@ -24,6 +25,7 @@ module.exports = async (req, res) => {
 
     const token = tokenResponse.data.access_token;
 
+    // Sanatçı Arama
     const searchResponse = await axios.get(
       `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=10`,
       {
@@ -37,12 +39,14 @@ module.exports = async (req, res) => {
       name: artist.name,
       spotify_id: artist.id,
       image: artist.images?.[0]?.url || null,
-      spotify_url: artist.external_urls?.spotify || null
+      external_url: artist.external_urls?.spotify || null,
     }));
 
-    res.status(200).json({ results });
+    // 🎯 Sadece array döndür
+    return res.status(200).json(results);
+
   } catch (error) {
     console.error("Spotify sanatçı arama hatası:", error.response?.data || error.message);
-    res.status(500).json({ error: "Spotify sanatçı arama başarısız." });
+    return res.status(500).json({ error: "Spotify sanatçı arama başarısız." });
   }
 };
