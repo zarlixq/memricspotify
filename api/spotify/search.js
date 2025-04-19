@@ -11,6 +11,7 @@ module.exports = async (req, res) => {
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
   try {
+    // 🔐 Token alma
     const tokenResponse = await axios.post(
       "https://accounts.spotify.com/api/token",
       new URLSearchParams({ grant_type: "client_credentials" }),
@@ -24,6 +25,7 @@ module.exports = async (req, res) => {
 
     const token = tokenResponse.data.access_token;
 
+    // 🔍 Arama yap
     const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`;
     const searchResponse = await axios.get(searchUrl, {
       headers: {
@@ -31,20 +33,23 @@ module.exports = async (req, res) => {
       },
     });
 
-    const track = searchResponse.data.tracks.items[0];
+    const tracks = searchResponse.data.tracks.items;
 
-    if (!track) {
+    if (!tracks || tracks.length === 0) {
       return res.status(404).json({ error: "Şarkı bulunamadı." });
     }
 
-    return res.status(200).json({
+    // 🔁 Liste olarak dön
+    const result = tracks.map((track) => ({
       name: track.name,
       artist: track.artists.map((a) => a.name).join(", "),
-      image: track.album.images[0]?.url,
+      image: track.album.images[0]?.url || '',
       external_url: track.external_urls.spotify,
-    });
+    }));
+
+    return res.status(200).json(result);
   } catch (error) {
-    console.error("Hata:", error.response?.data || error.message);
+    console.error("❌ Spotify API hatası:", error.response?.data || error.message);
     return res.status(500).json({ error: "Spotify API hatası." });
   }
 };
